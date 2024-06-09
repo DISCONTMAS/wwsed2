@@ -102,12 +102,26 @@ def companyPage(request, companies_id):
             elif statement.parametr.id == 9:
                 foreign_employees = statement
 
-        years_list = CompanyFinancialStatements.objects.filter(companies=companies_id).values_list("year", flat=True).distinct()
+        years_list = CompanyFinancialStatements.objects.filter(companies=companies_id).values_list("year",
+                                                                                                   flat=True).distinct()
         years_and_statements_values = []
 
+        revenue_by_year = []
+
         for year in years_list:
-            values_for_year = CompanyFinancialStatements.objects.filter(companies=companies_id, year=year).order_by("parametr_id").values_list("value", flat=True)
+            values_for_year = CompanyFinancialStatements.objects.filter(companies=companies_id, year=year).order_by(
+                "parametr_id").values_list("value", flat=True)
             years_and_statements_values.append((year, values_for_year))
+
+            # Get revenue for the year
+            revenue_statement = CompanyFinancialStatements.objects.filter(companies=companies_id, year=year,
+                                                                          parametr__id=1).first()
+            if revenue_statement:
+                revenue_by_year.append((year, revenue_statement.value))
+
+        # Separate years and revenues for use in the template
+        years = [year for year, _ in revenue_by_year]
+        revenues = [revenue for _, revenue in revenue_by_year]
 
         context = {
             'revenue': revenue,
@@ -120,7 +134,9 @@ def companyPage(request, companies_id):
             'foreign_employees': foreign_employees,
             'share': share,
             'parametrs_set': parametrs_set,
-            'years_and_statements_values': years_and_statements_values
+            'years_and_statements_values': years_and_statements_values,
+            'years': years,
+            'revenues': revenues
         }
         return render(request, 'main/companypage.html', context)
 

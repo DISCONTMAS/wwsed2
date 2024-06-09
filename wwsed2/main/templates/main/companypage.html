@@ -36,7 +36,7 @@
         <table class="table table-striped">
             <thead>
                 <tr>
-                    <th>Год</th> <!-- Добавляем заголовок нового столбца -->
+                    <th>Год</th>
                     {% for parametr in parametrs_set %}
                         <th>{{ parametr }}</th>
                     {% endfor %}
@@ -45,7 +45,7 @@
             <tbody>
                 {% for year, values_for_year in years_and_statements_values %}
                     <tr>
-                        <td>{{ year }}</td> <!-- Добавляем значение нового столбца -->
+                        <td>{{ year }}</td>
                         {% for value in values_for_year %}
                             <td>{{ value }}</td>
                         {% endfor %}
@@ -55,4 +55,38 @@
         </table>
     </div>
 </div>
+
+<div class="card mt-4">
+    <div class="card-header">
+        <h3>График выручки по годам</h3>
+    </div>
+    <div class="card-body">
+        <canvas id="revenueChart"></canvas>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    var ctx = document.getElementById('revenueChart').getContext('2d');
+    var revenueChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: {{ years|safe }},
+            datasets: [{
+                label: 'Выручка',
+                data: {{ revenues|safe }},
+                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>
 {% endblock %}
