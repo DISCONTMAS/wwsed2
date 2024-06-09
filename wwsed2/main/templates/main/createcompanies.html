@@ -1,0 +1,18 @@
+{% extends "layout/basic.html" %}
+
+{% block title %}Добавление компании{% endblock %}
+
+{% block content %}
+<div class="card mt-5">
+    <div class="card-header">
+        <h2>Добавление компании</h2>
+    </div>
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-success">Добавить</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,58 @@
+{% extends "layout/basic.html" %}
+
+{% block title %}{{ revenue.companies }} || Компания{% endblock %}
+
+{% block content %}
+<div class="card mb-4 mt-5">
+    <div class="card-header">
+        <h2>{{ revenue.companies }}</h2>
+    </div>
+    <div class="card-body">
+        <h3>Статистика за {{ revenue.year }} год</h3>
+        <div class="row">
+            <div class="col-md-6">
+                <p><strong>{{ parametrs_set.0 }}:</strong> {{ revenue.value }}</p>
+                <p><strong>{{ parametrs_set.1 }}:</strong> {{ average_salary.value }}</p>
+                <p><strong>{{ parametrs_set.2 }}:</strong> {{ number_of_employees.value }}</p>
+                <p><strong>{{ parametrs_set.3 }}:</strong> {{ percentage_of_women.value }}</p>
+            </div>
+            <div class="col-md-6">
+                <p><strong>{{ parametrs_set.4 }}:</strong> {{ date_of_the_report.value }}</p>
+                <p><strong>{{ parametrs_set.5 }}:</strong> {% if participation_in_charity.value == "1" %}Да{% else %}Нет{% endif %}</p>
+                <p><strong>{{ parametrs_set.6 }}:</strong> {{ debt.value }}</p>
+                <p><strong>{{ parametrs_set.7 }}:</strong> {{ share.value }}</p>
+                <p><strong>{{ parametrs_set.8 }}:</strong> {{ foreign_employees.value }}</p>
+            </div>
+        </div>
+        <h3>Дата отчета: {{ date_of_the_report.value }}</h3>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h3>Вся существующая статистика на данный момент</h3>
+    </div>
+    <div class="card-body">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Год</th> <!-- Добавляем заголовок нового столбца -->
+                    {% for parametr in parametrs_set %}
+                        <th>{{ parametr }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for year, values_for_year in years_and_statements_values %}
+                    <tr>
+                        <td>{{ year }}</td> <!-- Добавляем значение нового столбца -->
+                        {% for value in values_for_year %}
+                            <td>{{ value }}</td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

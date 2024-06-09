@@ -1,0 +1,14 @@
+{% extends "layout/basic.html" %}
+
+{% block title %}{{ company.name }}{% endblock %}
+
+{% block content %}
+<div class="card mt-5">
+    <div class="card-header">
+        <h1>{{ company.name }}</h1>
+    </div>
+    <div class="card-body">
+        <h2>Статистические данные компании отсутствуют в системе</h2>
+    </div>
+</div>
+{% endblock %}

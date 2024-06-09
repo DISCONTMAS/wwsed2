@@ -1,0 +1,15 @@
+{% extends "layout/basic.html" %}
+
+{% block title %}Найденные компании{% endblock %}
+
+{% block content %}
+<h2 class="mt-5">Найденные компании</h2>
+{% for data in object_list %}
+    <div class="company-card p-3 mb-3">
+        <a href="/main/{{ data.companies_id }}"><h3>{{ data.companies }}</h3></a>
+        <p>Вид деятельности: {{ data.type }}</p>
+        <p>ИНН: {{ data.inn }}</p>
+        <p>ОГРН: {{ data.ogrn }}</p>
+    </div>
+{% endfor %}
+{% endblock %}

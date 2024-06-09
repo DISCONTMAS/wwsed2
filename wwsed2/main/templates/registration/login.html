@@ -1,0 +1,22 @@
+{% extends "layout/basic.html" %}
+{% block title %}Авторизация{% endblock %}
+{% block content %}
+<main class="form-signin w-100 m-auto mt-5">
+    <form method="post" action="">
+    {% csrf_token %}
+    <h1 class="h3 mb-3 fw-normal">Пожалуйста, авторизуйтесь</h1>
+
+    <div class="form-floating">
+      <input name="login" class="form-control" id="floatingInput" placeholder="Логин" required>
+      <label for="floatingInput">Логин</label>
+    </div>
+    <div class="form-floating">
+      <input type="password" name="password" class="form-control" id="floatingPassword" placeholder="Пароль" required>
+      <label for="floatingPassword">Пароль</label>
+    </div>
+
+    <button class="w-100 btn btn-lg btn-primary" type="submit">Войти</button>
+  </form>
+</main>
+{% endblock %}
+
