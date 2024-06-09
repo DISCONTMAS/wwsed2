@@ -79,64 +79,46 @@ def companyPage(request, companies_id):
     if companyStatements2023.exists():
         parametrs_set = list(Parametrs.objects.values_list("name", flat=True).order_by("id"))
 
-        revenue = average_salary = number_of_employees = percentage_of_women = date_of_the_report = None
-        participation_in_charity = debt = share = foreign_employees = None
+        # Инициализация параметров
+        parametr_dict = {param_id: None for param_id in range(1, 10)}
 
         for statement in companyStatements2023:
-            if statement.parametr.id == 1:
-                revenue = statement
-            elif statement.parametr.id == 2:
-                average_salary = statement
-            elif statement.parametr.id == 3:
-                number_of_employees = statement
-            elif statement.parametr.id == 4:
-                percentage_of_women = statement
-            elif statement.parametr.id == 5:
-                date_of_the_report = statement
-            elif statement.parametr.id == 6:
-                participation_in_charity = statement
-            elif statement.parametr.id == 7:
-                debt = statement
-            elif statement.parametr.id == 8:
-                share = statement
-            elif statement.parametr.id == 9:
-                foreign_employees = statement
+            parametr_dict[statement.parametr.id] = statement
 
-        years_list = CompanyFinancialStatements.objects.filter(companies=companies_id).values_list("year",
-                                                                                                   flat=True).distinct()
+        years_list = CompanyFinancialStatements.objects.filter(companies=companies_id).values_list("year", flat=True).distinct()
         years_and_statements_values = []
 
-        revenue_by_year = []
+        # Словарь для хранения значений по каждому параметру
+        parametrs_data = {param_id-1: [] for param_id in range(1, 10)}
 
         for year in years_list:
-            values_for_year = CompanyFinancialStatements.objects.filter(companies=companies_id, year=year).order_by(
-                "parametr_id").values_list("value", flat=True)
+            values_for_year = CompanyFinancialStatements.objects.filter(companies=companies_id, year=year).order_by("parametr_id").values_list("value", flat=True)
             years_and_statements_values.append((year, values_for_year))
 
-            # Get revenue for the year
-            revenue_statement = CompanyFinancialStatements.objects.filter(companies=companies_id, year=year,
-                                                                          parametr__id=1).first()
-            if revenue_statement:
-                revenue_by_year.append((year, revenue_statement.value))
+            # Заполнение данных по каждому параметру
+            for param_id in parametrs_data:
+                statement = CompanyFinancialStatements.objects.filter(companies=companies_id, year=year, parametr__id=param_id+1).first()
+                if statement:
+                    parametrs_data[param_id].append((year, statement.value))
 
-        # Separate years and revenues for use in the template
-        years = [year for year, _ in revenue_by_year]
-        revenues = [revenue for _, revenue in revenue_by_year]
+        # Подготовка данных для использования в шаблоне
+        parametrs_json_data = {
+            param_id: {
+                'years': [year for year, _ in data],
+                'values': [value for _, value in data]
+            }
+            for param_id, data in parametrs_data.items()
+        }
+
+        # Получение данных компании
+        company_data = DataOfCompanies.objects.filter(companies_id=companies_id).first()
 
         context = {
-            'revenue': revenue,
-            'average_salary': average_salary,
-            'number_of_employees': number_of_employees,
-            'percentage_of_women': percentage_of_women,
-            'date_of_the_report': date_of_the_report,
-            'participation_in_charity': participation_in_charity,
-            'debt': debt,
-            'foreign_employees': foreign_employees,
-            'share': share,
             'parametrs_set': parametrs_set,
             'years_and_statements_values': years_and_statements_values,
-            'years': years,
-            'revenues': revenues
+            'parametrs_json_data': parametrs_json_data,
+            'company_data': company_data,
+            **parametr_dict
         }
         return render(request, 'main/companypage.html', context)
 

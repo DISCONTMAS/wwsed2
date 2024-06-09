@@ -8,23 +8,14 @@
         <h2>{{ revenue.companies }}</h2>
     </div>
     <div class="card-body">
-        <h3>Статистика за {{ revenue.year }} год</h3>
+        <h3>Информация о компании</h3>
         <div class="row">
             <div class="col-md-6">
-                <p><strong>{{ parametrs_set.0 }}:</strong> {{ revenue.value }}</p>
-                <p><strong>{{ parametrs_set.1 }}:</strong> {{ average_salary.value }}</p>
-                <p><strong>{{ parametrs_set.2 }}:</strong> {{ number_of_employees.value }}</p>
-                <p><strong>{{ parametrs_set.3 }}:</strong> {{ percentage_of_women.value }}</p>
-            </div>
-            <div class="col-md-6">
-                <p><strong>{{ parametrs_set.4 }}:</strong> {{ date_of_the_report.value }}</p>
-                <p><strong>{{ parametrs_set.5 }}:</strong> {% if participation_in_charity.value == "1" %}Да{% else %}Нет{% endif %}</p>
-                <p><strong>{{ parametrs_set.6 }}:</strong> {{ debt.value }}</p>
-                <p><strong>{{ parametrs_set.7 }}:</strong> {{ share.value }}</p>
-                <p><strong>{{ parametrs_set.8 }}:</strong> {{ foreign_employees.value }}</p>
+                <p><strong>Тип деятельности:</strong> {{ company_data.type }}</p>
+                <p><strong>ИНН:</strong> {{ company_data.inn }}</p>
+                <p><strong>ОГРН:</strong> {{ company_data.ogrn }}</p>
             </div>
         </div>
-        <h3>Дата отчета: {{ date_of_the_report.value }}</h3>
     </div>
 </div>
 
@@ -58,23 +49,34 @@
 
 <div class="card mt-4">
     <div class="card-header">
-        <h3>График выручки по годам</h3>
+        <h3>График параметров по годам</h3>
     </div>
     <div class="card-body">
-        <canvas id="revenueChart"></canvas>
+        <div class="form-group">
+            <label for="parametrSelect">Выберите параметр для отображения:</label>
+            <select id="parametrSelect" class="form-control">
+                {% for param in parametrs_set %}
+                    <option value="{{ forloop.counter0 }}">{{ param }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <canvas id="parametrChart"></canvas>
     </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    var ctx = document.getElementById('revenueChart').getContext('2d');
-    var revenueChart = new Chart(ctx, {
+    var parametrsData = {{ parametrs_json_data|safe }};
+    var parametrsSet = {{ parametrs_set|safe }};
+
+    var ctx = document.getElementById('parametrChart').getContext('2d');
+    var parametrChart = new Chart(ctx, {
         type: 'line',
         data: {
-            labels: {{ years|safe }},
+            labels: parametrsData[0].years,
             datasets: [{
-                label: 'Выручка',
-                data: {{ revenues|safe }},
+                label: parametrsSet[0],
+                data: parametrsData[0].values,
                 backgroundColor: 'rgba(54, 162, 235, 0.2)',
                 borderColor: 'rgba(54, 162, 235, 1)',
                 borderWidth: 1
@@ -87,6 +89,14 @@
                 }
             }
         }
+    });
+
+    document.getElementById('parametrSelect').addEventListener('change', function() {
+        var selectedParam = this.value;
+        parametrChart.data.labels = parametrsData[selectedParam].years;
+        parametrChart.data.datasets[0].label = parametrsSet[selectedParam];
+        parametrChart.data.datasets[0].data = parametrsData[selectedParam].values;
+        parametrChart.update();
     });
 </script>
 {% endblock %}
