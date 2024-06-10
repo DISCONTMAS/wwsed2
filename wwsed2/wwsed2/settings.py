@@ -126,6 +126,8 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+STATIC_ROOT = BASE_DIR / 'staticfiles'  # Это директория, куда будут собраны все статические файлы
+
 STATICFILES_DIRS = [BASE_DIR / 'main' / 'templates' / 'src']
 
 

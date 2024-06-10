@@ -73,8 +73,8 @@
             </div>
             <nav class="site-navigation">
                 <ul class="nav">
-                    <li><a href="/main/">Главная</a></li>
-                    <li><a href="/main/add/">Добавить компанию</a></li>
+                    <li><a href="/main/" class="btn btn-light">Главная</a></li>
+                    <li><a href="/main/add/" class="btn btn-light">Добавить компанию</a></li>
                     <li>
                         <form action="{% url 'search_company' %}" method="get" class="search-form">
                             {% csrf_token %}
