@@ -1,15 +1,32 @@
 {% extends "layout/basic.html" %}
 
-{% block title %}Найденные компании{% endblock %}
+{% block title %}Компании{% endblock %}
 
 {% block content %}
-<h2 class="mt-5">Найденные компании</h2>
+<h2 class="mb-4 mt-5">Список компаний</h2>
+
+<style>
+    .company-card {
+        background-color: white;
+        border: 1px solid #dfdfdf;
+        border-radius: 8px;
+        transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .company-card:hover {
+        transform: scale(1.05);
+        box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+    }
+</style>
+
 {% for data in object_list %}
-    <div class="company-card p-3 mb-3">
-        <a href="/main/{{ data.companies_id }}"><h3>{{ data.companies }}</h3></a>
+    <div class="company-card p-3 mb-3" onclick="window.location.href='{{ data.companies_id }}'">
+        <a href="/main/{{ data.companies_id }}" class="text-decoration-none text-dark">
+            <h3>{{ data.companies }}</h3>
+        </a>
         <p>Вид деятельности: {{ data.type }}</p>
         <p>ИНН: {{ data.inn }}</p>
         <p>ОГРН: {{ data.ogrn }}</p>
     </div>
 {% endfor %}
+
 {% endblock %}
