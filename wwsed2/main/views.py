@@ -72,6 +72,7 @@ def companieslist(request):
     context = {'page_obj': page_obj}
     return render(request, 'main/companieslist.html', context)
 
+
 @login_required
 def companyPage(request, companies_id):
     companyStatements2023 = CompanyFinancialStatements.objects.filter(companies=companies_id, year=2023)

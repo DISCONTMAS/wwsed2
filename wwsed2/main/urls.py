@@ -1,7 +1,7 @@
 from django.contrib.auth.views import LogoutView
 from django.urls import path
 from .views import (companieslist, companyPage, companySearch,
-                    CompanyCreateView, DataOfCompaniesCreateView, login_view, logout_view,
+                    CompanyCreateView, DataOfCompaniesCreateView, login_view, logout_view
                     )
 
 urlpatterns = [
