@@ -23,7 +23,7 @@ def login_view(request):
 
         if user is not None:
             login(request, user)
-            return redirect('/main/')
+            return redirect('/')
         else:
             # Если учетные данные неверные, возвращаем пользователя на страницу логина с сообщение об ошибке
             return render(request, "registration/login.html", {"error": "Неверные логин или пароль"})

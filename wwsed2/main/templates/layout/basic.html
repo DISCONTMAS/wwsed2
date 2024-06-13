@@ -69,12 +69,12 @@
     <header class="site-header">
         <div class="container">
             <div class="site-identity">
-                <h1><a href="/main/">Экономические данные</a></h1>
+                <h1><a href="/">Экономические данные</a></h1>
             </div>
             <nav class="site-navigation">
                 <ul class="nav">
-                    <li><a href="/main/" class="btn btn-light">Главная</a></li>
-                    <li><a href="/main/add/" class="btn btn-light">Добавить компанию</a></li>
+                    <li><a href="/" class="btn btn-light">Главная</a></li>
+                    <li><a href="/add/" class="btn btn-light">Добавить компанию</a></li>
                     <li>
                         <form action="{% url 'search_company' %}" method="get" class="search-form">
                             {% csrf_token %}

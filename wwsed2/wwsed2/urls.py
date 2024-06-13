@@ -20,7 +20,7 @@ from main.views import login_view
 
 
 urlpatterns = [
-    path('main/', include('main.urls')),
+    path('', include('main.urls')),
     path('accounts/login/', login_view, name='login'),  # Правильный путь с закрывающим слешем
     path('admin/', admin.site.urls),
 
