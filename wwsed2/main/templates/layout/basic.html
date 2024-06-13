@@ -8,6 +8,20 @@
     <!-- Bootstrap CSS -->
     <link href="{% static 'bootstrap/css/bootstrap.min.css' %}" type="text/css" rel="stylesheet">
     <style>
+         .sortable {
+        cursor: pointer;
+        position: relative;
+        padding-right: 20px;
+         }
+
+         .sortable:hover {
+        background-color: #f0f0f0;
+         }
+
+         .sortable .sort-indicator {
+        position: absolute;
+        right: 5px;
+    }
         body {
             font-family: Arial, sans-serif;
             background-color: #f0f0f0;

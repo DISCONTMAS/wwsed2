@@ -24,20 +24,20 @@
         <h3>Вся существующая статистика на данный момент</h3>
     </div>
     <div class="card-body">
-        <table class="table table-striped">
+        <table class="table table-striped" id="financial-statements-table">
             <thead>
                 <tr>
-                    <th>Год</th>
-                    {% for parametr in parametrs_set %}
-                        <th>{{ parametr }}</th>
+                    <th class="sortable" data-column="0">Год <span class="sort-indicator"></span></th>
+                    {% for param in parametrs_set %}
+                        <th class="sortable" data-column="{{ forloop.counter }}">{{ param }} <span class="sort-indicator"></span></th>
                     {% endfor %}
                 </tr>
             </thead>
             <tbody>
-                {% for year, values_for_year in years_and_statements_values %}
+                {% for year, values in years_and_statements_values %}
                     <tr>
                         <td>{{ year }}</td>
-                        {% for value in values_for_year %}
+                        {% for value in values %}
                             <td>{{ value }}</td>
                         {% endfor %}
                     </tr>
@@ -66,9 +66,11 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
+    // Данные для графика
     var parametrsData = {{ parametrs_json_data|safe }};
     var parametrsSet = {{ parametrs_set|safe }};
 
+    // Инициализация графика
     var ctx = document.getElementById('parametrChart').getContext('2d');
     var parametrChart = new Chart(ctx, {
         type: 'line',
@@ -91,6 +93,7 @@
         }
     });
 
+    // Обработчик изменения параметра для графика
     document.getElementById('parametrSelect').addEventListener('change', function() {
         var selectedParam = this.value;
         parametrChart.data.labels = parametrsData[selectedParam].years;
@@ -98,5 +101,71 @@
         parametrChart.data.datasets[0].data = parametrsData[selectedParam].values;
         parametrChart.update();
     });
+
+    // Функция для сортировки таблицы
+    function sortTable(column, order) {
+        let table = document.getElementById('financial-statements-table');
+        let tbody = table.querySelector('tbody');
+        let rows = Array.from(tbody.querySelectorAll('tr'));
+
+        rows.sort((a, b) => {
+            let aText = a.cells[column].innerText || a.cells[column].textContent;
+            let bText = b.cells[column].innerText || b.cells[column].textContent;
+
+            // Преобразование строк в числа, если возможно
+            let aValue = parseFloat(aText) || aText;
+            let bValue = parseFloat(bText) || bText;
+
+            if (order === 'asc') {
+                return aValue > bValue ? 1 : -1;
+            } else {
+                return aValue < bValue ? 1 : -1;
+            }
+        });
+
+        tbody.innerHTML = '';
+        rows.forEach(row => tbody.appendChild(row));
+    }
+
+    // Инициализация сортировки по умолчанию
+    function initDefaultSort() {
+        let defaultColumn = 0;  // Устанавливаем первую колонку (Год) по умолчанию
+        let defaultOrder = 'asc';
+
+        document.querySelector(`th[data-column="${defaultColumn}"]`).setAttribute('data-order', defaultOrder);
+        document.querySelector(`th[data-column="${defaultColumn}"] .sort-indicator`).innerHTML = '&#9650;'; // Треугольник вверх
+
+        sortTable(defaultColumn, defaultOrder);
+    }
+
+    // Добавление обработчиков для заголовков таблицы
+    document.querySelectorAll('.sortable').forEach(header => {
+        header.addEventListener('click', () => {
+            let column = header.getAttribute('data-column');
+            let currentOrder = header.getAttribute('data-order') || 'asc';
+            let newOrder = currentOrder === 'asc' ? 'desc' : 'asc';
+
+            // Обновление всех индикаторов сортировки
+            document.querySelectorAll('.sort-indicator').forEach(indicator => {
+                indicator.innerHTML = '';
+            });
+
+            // Установка текущего индикатора сортировки
+            if (newOrder === 'asc') {
+                header.querySelector('.sort-indicator').innerHTML = '&#9650;'; // Треугольник вверх
+            } else {
+                header.querySelector('.sort-indicator').innerHTML = '&#9660;'; // Треугольник вниз
+            }
+
+            // Обновление атрибута order в заголовке
+            header.setAttribute('data-order', newOrder);
+
+            // Сортировка таблицы
+            sortTable(column, newOrder);
+        });
+    });
+
+    // Сортировка при загрузке страницы
+    window.onload = initDefaultSort;
 </script>
 {% endblock %}

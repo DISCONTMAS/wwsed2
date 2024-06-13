@@ -7,6 +7,8 @@ from django.core.paginator import Paginator
 from django.views import generic
 from .forms import DataOfCompaniesForm, CompanyForm, CompanySearchForm
 from django.contrib.auth import authenticate, login, logout
+from django.db.models import Case, When
+
 
 
 def logout_view(request):
@@ -91,6 +93,9 @@ def companieslist(request):
 
 @login_required
 def companyPage(request, companies_id):
+    sort_by = request.GET.get('sort_by')
+    order = request.GET.get('order')
+
     companyStatements2023 = CompanyFinancialStatements.objects.filter(companies=companies_id, year=2023)
 
     if companyStatements2023.exists():
@@ -102,19 +107,22 @@ def companyPage(request, companies_id):
         for statement in companyStatements2023:
             parametr_dict[statement.parametr.id] = statement
 
-        years_list = CompanyFinancialStatements.objects.filter(companies=companies_id).values_list("year", flat=True).distinct()
+        years_list = CompanyFinancialStatements.objects.filter(companies=companies_id).values_list("year",
+                                                                                                   flat=True).distinct()
         years_and_statements_values = []
 
         # Словарь для хранения значений по каждому параметру
-        parametrs_data = {param_id-1: [] for param_id in range(1, 10)}
+        parametrs_data = {param_id - 1: [] for param_id in range(1, 10)}
 
         for year in years_list:
-            values_for_year = CompanyFinancialStatements.objects.filter(companies=companies_id, year=year).order_by("parametr_id").values_list("value", flat=True)
+            values_for_year = CompanyFinancialStatements.objects.filter(companies=companies_id, year=year).order_by(
+                "parametr_id").values_list("value", flat=True)
             years_and_statements_values.append((year, values_for_year))
 
             # Заполнение данных по каждому параметру
             for param_id in parametrs_data:
-                statement = CompanyFinancialStatements.objects.filter(companies=companies_id, year=year, parametr__id=param_id+1).first()
+                statement = CompanyFinancialStatements.objects.filter(companies=companies_id, year=year,
+                                                                      parametr__id=param_id + 1).first()
                 if statement:
                     parametrs_data[param_id].append((year, statement.value))
 
@@ -127,6 +135,12 @@ def companyPage(request, companies_id):
             for param_id, data in parametrs_data.items()
         }
 
+        # Обработка сортировки
+        if sort_by and order:
+            sort_param = int(sort_by)
+            years_and_statements_values = sorted(years_and_statements_values, key=lambda x: x[1][sort_param],
+                                                 reverse=(order == 'desc'))
+
         # Получение данных компании
         company_data = DataOfCompanies.objects.filter(companies_id=companies_id).first()
 
@@ -135,6 +149,8 @@ def companyPage(request, companies_id):
             'years_and_statements_values': years_and_statements_values,
             'parametrs_json_data': parametrs_json_data,
             'company_data': company_data,
+            'sort_by': sort_by,
+            'order': order,
             **parametr_dict
         }
         return render(request, 'main/companypage.html', context)
