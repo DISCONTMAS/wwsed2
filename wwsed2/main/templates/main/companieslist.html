@@ -5,6 +5,24 @@
 {% block content %}
 <h2 class="mb-4 mt-5">Список компаний</h2>
 
+<form method="GET" class="mb-4">
+    <div class="form-row">
+        <div class="form-group col-md-3">
+            {{ form.type.label_tag }}
+            {{ form.type }}
+        </div>
+        <div class="form-group col-md-3">
+            {{ form.inn.label_tag }}
+            {{ form.inn }}
+        </div>
+        <div class="form-group col-md-3">
+            {{ form.ogrn.label_tag }}
+            {{ form.ogrn }}
+        </div>
+    </div>
+    <button type="submit" class="btn btn-primary">Поиск</button>
+</form>
+
 <style>
     .company-card {
         background-color: white;
@@ -40,7 +58,6 @@
             </li>
         {% endif %}
 
-        {# Display page numbers #}
         {% for num in page_obj.paginator.page_range %}
             {% if page_obj.number == num %}
                 <li class="page-item active">

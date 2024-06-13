@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from .models import DataOfCompanies, CompanyFinancialStatements, Companies, Parametrs
 from django.core.paginator import Paginator
 from django.views import generic
-from .forms import DataOfCompaniesForm, CompanyForm
+from .forms import DataOfCompaniesForm, CompanyForm, CompanySearchForm
 from django.contrib.auth import authenticate, login, logout
 
 
@@ -65,11 +65,27 @@ class companySearch(LoginRequiredMixin, generic.ListView):
 def companieslist(request):
     datas = DataOfCompanies.objects.all().order_by('id')  # Упорядочивание данных
 
+    # Фильтрация данных на основе введенных критериев
+    if request.method == 'GET':
+        form = CompanySearchForm(request.GET)
+        if form.is_valid():
+            if form.cleaned_data['type']:
+                datas = datas.filter(type=form.cleaned_data['type'])
+            if form.cleaned_data['inn']:
+                datas = datas.filter(inn__icontains=form.cleaned_data['inn'])
+            if form.cleaned_data['ogrn']:
+                datas = datas.filter(ogrn__icontains=form.cleaned_data['ogrn'])
+    else:
+        form = CompanySearchForm()
+
     paginator = Paginator(datas, 50)  # 50 компаний на странице
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
 
-    context = {'page_obj': page_obj}
+    context = {
+        'page_obj': page_obj,
+        'form': form
+    }
     return render(request, 'main/companieslist.html', context)
 
 
